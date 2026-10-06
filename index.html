@@ -41,8 +41,9 @@
   /* ---------- Phone frame ---------- */
   .phone {
     position: relative;
-    width: 402px; height: 874px;
-    border-radius: 56px;
+    /* iPhone mini proportions, shrunk further to fit short windows */
+    height: min(812px, calc(100dvh - 72px)); aspect-ratio: 375 / 812;
+    border-radius: 50px;
     background: var(--bg);
     overflow: hidden;
     box-shadow: 0 0 0 12px #1c1c1e, 0 0 0 14px #3a3a3c, 0 40px 80px rgba(0,0,0,0.35);
@@ -67,7 +68,7 @@
   .screen.active { display: flex; }
   @media (max-width: 500px) {
     body { background: var(--bg); }
-    .phone { width: 100vw; height: 100dvh; border-radius: 0; box-shadow: none; }
+    .phone { width: 100vw; height: 100dvh; aspect-ratio: auto; border-radius: 0; box-shadow: none; }
     .status-bar, .island { display: none !important; }
     .screen { padding-top: env(safe-area-inset-top, 12px); }
   }
