@@ -228,6 +228,13 @@
   .w-list { display: flex; flex-direction: column; gap: 10px; }
   .w-row { position: relative; transition: margin .3s var(--spring), transform .3s var(--spring); touch-action: pan-y; }
   .w-row.sub { margin-left: 28px; transform: scale(0.97); transform-origin: right center; }
+  /* tree connector: an elbow from the parent above into the sub-item */
+  .w-row.sub::before {
+    content: ""; position: absolute; left: -17px; top: -10px; width: 13px; height: calc(50% + 10px);
+    border-left: 1.6px solid var(--tertiary); border-bottom: 1.6px solid var(--tertiary);
+    border-bottom-left-radius: 8px; pointer-events: none;
+  }
+  .w-row.sub + .w-row.sub::before { top: calc(-50% - 10px); height: calc(100% + 10px); }
   .w-row.gap { visibility: hidden; }
   .w-tray { position: absolute; right: 0; top: 0; bottom: 0; width: 116px; display: flex; align-items: center; justify-content: center; gap: 8px; }
   .w-act { width: 50px; height: 50px; border-radius: 25px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #fff; opacity: 0; transform: scale(.6); }
