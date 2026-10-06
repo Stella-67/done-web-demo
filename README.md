@@ -3,7 +3,9 @@
 A single-file, interactive web demo of the Done iOS app (calendar timeline, Wanna list, weekly report).
 Mock data only — nothing is stored; refresh to reset.
 
-Open `index.html` in a browser, or visit the GitHub Pages site.
+**Live demo: https://stella-67.github.io/done-web-demo/**
+
+Or open `index.html` locally in any browser.
 
 ## Gestures
 
