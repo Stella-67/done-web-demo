@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
@@ -179,6 +179,12 @@
   .event.resizing .handle { width: 70%; }
   .event.fading .handle { opacity: 0; transition: opacity .35s; }
   @media (hover: hover) { .event:hover .handle { opacity: 1; } }
+  .ext-band { position: absolute; left: 56px; right: 0; background: color-mix(in srgb, var(--primary) 4%, transparent); border-radius: 8px; pointer-events: none; animation: fadein .28s; }
+  .ext-chip { position: absolute; left: 50%; transform: translateX(-50%); font-size: 11px; font-weight: 600; color: var(--secondary); padding: 3px 10px; border-radius: 999px; background: color-mix(in srgb, var(--primary) 8%, transparent); }
+  .hour-row.ext label { color: var(--tertiary); }
+  .hour-row.midnight { background: color-mix(in srgb, var(--primary) 18%, transparent); }
+  .event.cont-top { border-top-left-radius: 0; border-top-right-radius: 0; border-top-style: dashed; }
+  .event.cont-bottom { border-bottom-left-radius: 0; border-bottom-right-radius: 0; border-bottom-style: dashed; }
   .now-line { position: absolute; left: -6px; right: 0; height: 1.5px; background: var(--red); z-index: 10; pointer-events: none; }
   .now-line::before { content: ""; position: absolute; left: -4px; top: -3.5px; width: 8px; height: 8px; border-radius: 4px; background: var(--red); }
   .drag-hint { position: absolute; left: 0; width: 52px; text-align: right; padding-right: 8px; font-size: 10px; font-weight: 700; color: var(--accent); z-index: 21; pointer-events: none; font-variant-numeric: tabular-nums; background: var(--bg); display: none; }
@@ -304,26 +310,26 @@
 </head>
 <body>
 <div class="side-help">
-  <b>Done · Web Demo</b>（mock 数据，刷新即重置）<br><br>
-  <b>日历</b><br>
-  · 点事件 → 详情 / Log<br>
-  · 拖事件 → 移动（15 分钟吸附）<br>
-  · 拖事件上下边缘的把手 → 改时长<br>
-  · 长按事件 1 秒 → 快捷菜单（右键也行）<br>
-  · 拖到时间轴左右边缘停住 → 跨天<br>
-  · 拖到上下边缘 → 自动滚动<br>
-  · 在空白处拖 → 新建事件（会吸附到相邻事件）<br>
-  · 左右滑 / 触控板横扫 / ← → → 切换日期<br>
-  · 双指捏合 / ⌘+滚轮 / 触控板捏合 → 缩放<br>
-  · 在顶部继续往下拉 → 提醒面板<br>
-  · 长按日期标题 → 回到现在；点击 → 选日期<br>
-  · 横扫周条 → 切换一周<br><br>
-  <b>想做</b><br>
-  · 左滑 → 排期 / 删除　· 右滑 → 缩进<br>
-  · 长按后拖 → 排序<br><br>
-  <b>报告</b>　左右滑切换周<br>
-  <b>弹窗</b>　按住顶部往下拉 → 关闭<br><br>
-  手机上用的是长按（0.35s 拖事件，0.5s 新建），和 app 一致；电脑上用鼠标可以直接拖。
+  <b>Done · Web Demo</b> (mock data, resets on refresh)<br><br>
+  <b>Calendar</b><br>
+  · Tap an event → details / log<br>
+  · Drag an event → move (15-min snap)<br>
+  · Drag the top/bottom handle → resize<br>
+  · Long-press an event 1s → quick menu (or right-click)<br>
+  · Hold at the left/right edge while dragging → change day<br>
+  · Drag near top/bottom → auto-scroll<br>
+  · Drag on empty space → new event (snaps to neighbours)<br>
+  · Swipe / trackpad swipe / ← → → change day<br>
+  · Pinch / ⌘+scroll / trackpad pinch → zoom<br>
+  · Pull down at the top → reminders panel<br>
+  · Long-press the date → jump to now; tap → date picker<br>
+  · Swipe the week strip → change week<br><br>
+  <b>Wanna</b><br>
+  · Swipe left → schedule / delete · swipe right → indent<br>
+  · Long-press, then drag → reorder<br><br>
+  <b>Report</b> swipe left/right to change week<br>
+  <b>Sheets</b> drag the top down → dismiss<br><br>
+  On touch devices, dragging needs a long-press first (0.35s to move, 0.5s to create), just like the app. With a mouse you can drag right away.
 </div>
 
 <div class="phone" id="phone">
@@ -338,10 +344,10 @@
         <div class="cal-title" id="cal-title"></div>
         <input type="date" id="date-input" />
         <div style="display:flex; gap:10px">
-          <div class="icon-btn glass" id="btn-reminders" title="提醒">
+          <div class="icon-btn glass" id="btn-reminders" title="Reminders">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1.2"/><circle cx="4.5" cy="12" r="1.2"/><circle cx="4.5" cy="18" r="1.2"/></svg>
           </div>
-          <div class="nav-btn glass" id="btn-today">今天</div>
+          <div class="nav-btn glass" id="btn-today">Today</div>
         </div>
       </div>
       <div class="week glass" id="week"></div>
@@ -362,16 +368,16 @@
 
   <nav class="tabbar glass" id="tabbar">
     <div class="tab" data-tab="wanna">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6 6.6 19.5l1.2-6L3.3 9.3l6.1-.7z"/></svg>想做
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6 6.6 19.5l1.2-6L3.3 9.3l6.1-.7z"/></svg>Wanna
     </div>
     <div class="tab active" data-tab="calendar">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>日历
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Calendar
     </div>
     <div class="tab" data-tab="report">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 20V11M12 20V4M19 20v-6"/></svg>报告
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 20V11M12 20V4M19 20v-6"/></svg>Report
     </div>
     <div class="tab" data-tab="me">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8.5" r="4"/><path d="M4.5 20c1.2-3.6 4-5.5 7.5-5.5s6.3 1.9 7.5 5.5"/></svg>我
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8.5" r="4"/><path d="M4.5 20c1.2-3.6 4-5.5 7.5-5.5s6.3 1.9 7.5 5.5"/></svg>Me
     </div>
   </nav>
 
@@ -379,9 +385,9 @@
   <div class="sheet" id="sheet">
     <div class="sheet-grip"><div class="grabber"></div></div>
     <div class="sheet-head sheet-grip">
-      <div><div class="nav-btn glass" id="sheet-cancel">取消</div></div>
+      <div><div class="nav-btn glass" id="sheet-cancel">Cancel</div></div>
       <div class="center" id="sheet-title"></div>
-      <div class="right"><div class="nav-btn glass" id="sheet-ok">完成</div></div>
+      <div class="right"><div class="nav-btn glass" id="sheet-ok">Done</div></div>
     </div>
     <div class="sheet-body" id="sheet-body"></div>
   </div>
@@ -393,10 +399,13 @@
 /* ============================================================
    Mock data — mirrors Done's Event / EventLog / EventType shape
    ============================================================ */
-const TYPES = { "工作": "#0A84FF", "学习": "#34C759", "运动": "#FFD60A", "睡眠": "#AF52DE", "社交": "#FF6B6B", "个人": "#FF9F0A", "创作": "#1ABC9C" };
-const EMOTIONS = ["专注", "平静", "开心", "有活力", "疲惫", "焦虑", "烦躁", "满足"];
-const STATUS = { completed: "完成", partial: "部分完成", skipped: "跳过" };
-const WEEKDAYS = ["日", "一", "二", "三", "四", "五", "六"];
+const TYPES = { "Work": "#0A84FF", "Study": "#34C759", "Exercise": "#FFD60A", "Sleep": "#AF52DE", "Social": "#FF6B6B", "Personal": "#FF9F0A", "Creative": "#1ABC9C" };
+const EMOTIONS = ["Focused", "Calm", "Happy", "Energized", "Tired", "Anxious", "Frustrated", "Satisfied"];
+const STATUS = { completed: "Completed", partial: "Partial", skipped: "Skipped" };
+const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const WD_SHORT = ["S", "M", "T", "W", "T", "F", "S"];
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const fmtDate = d => `${MONTHS[d.getMonth()]} ${d.getDate()}`;
 
 const DAY = 86400000;
 const startOfDay = d => { const x = new Date(d); x.setHours(0, 0, 0, 0); return x; };
@@ -407,33 +416,33 @@ let uid = 0;
 const id = () => "e" + (++uid);
 
 const TEMPLATES = [
-  [["晨跑", "运动", 7, 0, 7, 45, 3, ["有活力", "开心"], "沿河 5 公里，配速不错"],
-   ["Deep Work：Done iOS", "工作", 9, 0, 12, 0, 4, ["专注", "平静"], "把拖拽自动滚动的 bug 修掉了"],
-   ["午饭 + 散步", "个人", 12, 15, 13, 0, 1, ["平静"], ""],
-   ["Code Review", "工作", 14, 0, 15, 30, 3, ["专注"], "看了 3 个 PR"],
-   ["读 DDIA", "学习", 21, 0, 22, 0, 4, ["专注", "疲惫"], "第 5 章 replication"]],
-  [["力量训练", "运动", 7, 30, 8, 30, 4, ["有活力"], "卧推加了 2.5kg"],
-   ["Sprint Planning", "工作", 10, 0, 11, 0, 2, [], ""],
-   ["手势系统重构", "工作", 11, 0, 13, 0, 4, ["专注", "有活力"], ""],
-   ["API 联调", "工作", 14, 0, 17, 30, 5, ["烦躁", "专注"], "边界情况调了一下午，终于通了"],
-   ["钢琴练习", "创作", 20, 0, 20, 45, 3, ["平静", "开心"], "肖邦夜曲第二段"]],
-  [["Team Standup", "工作", 9, 30, 9, 45, 1, [], ""],
-   ["线上 bug 修复", "工作", 10, 0, 12, 30, 5, ["焦虑", "烦躁"], "hotfix 上线"],
-   ["补测试", "工作", 14, 0, 16, 30, 4, ["专注", "焦虑"], ""],
-   ["和朋友吃饭", "社交", 18, 30, 20, 0, 1, ["开心"], ""],
-   ["看 WWDC 视频", "学习", 21, 0, 22, 0, 2, ["疲惫"], "一直走神"]],
-  [["瑜伽", "运动", 8, 0, 9, 0, 2, ["平静", "开心"], ""],
-   ["Brunch", "社交", 10, 30, 12, 0, 1, ["开心", "有活力"], "聊了旅行计划"],
-   ["Side project：MCP server", "工作", 14, 0, 17, 0, 3, ["专注", "满足"], ""],
-   ["做饭", "个人", 18, 0, 19, 0, 2, ["平静"], "试了泰式咖喱"],
-   ["读《人类简史》", "学习", 21, 0, 22, 30, 3, ["专注", "平静"], ""]],
+  [["Morning Run", "Exercise", 7, 0, 7, 45, 3, ["Energized", "Happy"], "5K along the river, good pace"],
+   ["Deep Work: Done iOS", "Work", 9, 0, 12, 0, 4, ["Focused", "Calm"], "Fixed the drag auto-scroll bug"],
+   ["Lunch + Walk", "Personal", 12, 15, 13, 0, 1, ["Calm"], ""],
+   ["Code Review", "Work", 14, 0, 15, 30, 3, ["Focused"], "Reviewed 3 PRs"],
+   ["Read DDIA", "Study", 21, 0, 22, 0, 4, ["Focused", "Tired"], "Chapter 5: replication"]],
+  [["Strength Training", "Exercise", 7, 30, 8, 30, 4, ["Energized"], "Added 2.5kg on bench"],
+   ["Sprint Planning", "Work", 10, 0, 11, 0, 2, [], ""],
+   ["Gesture System Refactor", "Work", 11, 0, 13, 0, 4, ["Focused", "Energized"], ""],
+   ["API Integration", "Work", 14, 0, 17, 30, 5, ["Frustrated", "Focused"], "Edge cases all afternoon, finally cracked it"],
+   ["Piano Practice", "Creative", 20, 0, 20, 45, 3, ["Calm", "Happy"], "Chopin Nocturne, second section"]],
+  [["Team Standup", "Work", 9, 30, 9, 45, 1, [], ""],
+   ["Production Bug Fix", "Work", 10, 0, 12, 30, 5, ["Anxious", "Frustrated"], "Shipped the hotfix"],
+   ["Write Tests", "Work", 14, 0, 16, 30, 4, ["Focused", "Anxious"], ""],
+   ["Dinner with Friends", "Social", 18, 30, 20, 0, 1, ["Happy"], ""],
+   ["Watch WWDC Talks", "Study", 21, 0, 22, 0, 2, ["Tired"], "Kept drifting off"]],
+  [["Yoga", "Exercise", 8, 0, 9, 0, 2, ["Calm", "Happy"], ""],
+   ["Brunch", "Social", 10, 30, 12, 0, 1, ["Happy", "Energized"], "Talked about travel plans"],
+   ["Side Project: MCP Server", "Work", 14, 0, 17, 0, 3, ["Focused", "Satisfied"], ""],
+   ["Cook Dinner", "Personal", 18, 0, 19, 0, 2, ["Calm"], "Tried a Thai curry recipe"],
+   ["Read Sapiens", "Study", 21, 0, 22, 30, 3, ["Focused", "Calm"], ""]],
 ];
 
 function mkEvent(title, type, start, end, log) { return { id: id(), title, type, start, end, log }; }
 const events = [];
 for (let d = -27; d <= 3; d++) {
   const tpl = TEMPLATES[((d % 4) + 4) % 4];
-  events.push(mkEvent("睡眠", "睡眠", at(d, 0), at(d, 6, 45), d <= 0 ? { status: "completed", effort: 1, emotions: [], note: "" } : null));
+  events.push(mkEvent("Sleep", "Sleep", at(d - 1, 23, 15), at(d, 6, 45), d <= 0 ? { status: "completed", effort: 1, emotions: [], note: "" } : null));
   tpl.forEach(([title, type, sh, sm, eh, em, effort, emo, note], i) => {
     if ((d * 7 + i) % 11 === 0 && d < -1) return;   // a few gaps so weeks differ
     const start = at(d, sh, sm), end = at(d, eh, em);
@@ -444,21 +453,21 @@ for (let d = -27; d <= 3; d++) {
 }
 
 const wannas = [
-  { id: id(), title: "学会做手冲咖啡", type: "个人", note: "买一个 V60", done: false, parentId: null, scheduledId: null },
-  { id: id(), title: "研究一下磨豆机", type: "个人", note: "", done: false, parentId: null, scheduledId: null },
-  { id: id(), title: "读完《被讨厌的勇气》", type: "学习", note: "", done: false, parentId: null, scheduledId: null },
-  { id: id(), title: "周末去爬 Mission Peak", type: "运动", note: "约上室友", done: false, parentId: null, scheduledId: null },
-  { id: id(), title: "给 Done 做 Apple Watch 版", type: "工作", note: "先做 Focus 计时", done: false, parentId: null, scheduledId: null },
-  { id: id(), title: "约老朋友视频", type: "社交", note: "", done: false, parentId: null, scheduledId: null },
-  { id: id(), title: "录一首钢琴曲", type: "创作", note: "", done: true, parentId: null, scheduledId: null },
+  { id: id(), title: "Learn pour-over coffee", type: "Personal", note: "Buy a V60", done: false, parentId: null, scheduledId: null },
+  { id: id(), title: "Research coffee grinders", type: "Personal", note: "", done: false, parentId: null, scheduledId: null },
+  { id: id(), title: "Finish The Courage to Be Disliked", type: "Study", note: "", done: false, parentId: null, scheduledId: null },
+  { id: id(), title: "Hike Mission Peak this weekend", type: "Exercise", note: "Ask the roommates", done: false, parentId: null, scheduledId: null },
+  { id: id(), title: "Build an Apple Watch app for Done", type: "Work", note: "Start with the Focus timer", done: false, parentId: null, scheduledId: null },
+  { id: id(), title: "Video call with old friends", type: "Social", note: "", done: false, parentId: null, scheduledId: null },
+  { id: id(), title: "Record a piano piece", type: "Creative", note: "", done: true, parentId: null, scheduledId: null },
 ];
 wannas[1].parentId = wannas[0].id;
 
 const reminders = [
-  { id: id(), title: "回复导师邮件", done: false },
-  { id: id(), title: "取快递", done: false },
-  { id: id(), title: "给妈妈打电话", done: false },
-  { id: id(), title: "续订健身房会员", done: true },
+  { id: id(), title: "Reply to advisor's email", done: false },
+  { id: id(), title: "Pick up the package", done: false },
+  { id: id(), title: "Call Mom", done: false },
+  { id: id(), title: "Renew gym membership", done: true },
 ];
 
 /* ============================================================
@@ -468,7 +477,7 @@ const $ = s => document.querySelector(s);
 const h = html => { const t = document.createElement("template"); t.innerHTML = html.trim(); return t.content.firstElementChild; };
 const pad = n => String(n).padStart(2, "0");
 const fmtTime = d => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
-const fmtMin = m => `${pad(Math.floor(m / 60))}:${pad(Math.round(m % 60))}`;
+const fmtMin = m => { const x = ((Math.round(m) % 1440) + 1440) % 1440; return `${pad(Math.floor(x / 60))}:${pad(x % 60)}`; };
 const fmtDur = ms => { const m = Math.round(ms / 60000); return m >= 60 ? `${Math.floor(m / 60)}h${m % 60 ? " " + (m % 60) + "m" : ""}` : `${m}m`; };
 const hexA = (hex, a) => { const v = parseInt(hex.slice(1), 16); return `rgba(${v >> 16 & 255},${v >> 8 & 255},${v & 255},${a})`; };
 const sameDay = (a, b) => startOfDay(a).getTime() === startOfDay(b).getTime();
@@ -505,6 +514,7 @@ const S = {
   pinch: null,
   panelOpen: false,
   reportOffset: 0,
+  lead: 0, trail: 0,   // boundary extension (hours of prev / next day shown while dragging past midnight)
 };
 let currentTab = "calendar";
 
@@ -529,24 +539,53 @@ function updateFocusChrome() { phone.classList.toggle("event-focused", !!S.focus
 const wrapEl = $("#tl-wrap"), tlEl = $("#timeline"), layerEl = $("#events-layer"), hintEl = $("#drag-hint");
 const TOP_PAD = 8;
 const dayStartMs = () => startOfDay(S.selected).getTime();
-const pointerMin = clientY => (clientY - layerEl.getBoundingClientRect().top) / S.hour * 60;
+// The visible window is the selected day, plus the leading/trailing extension while a drag crosses midnight.
+const winStartMs = () => dayStartMs() - S.lead * 3600000;
+const winEndMs = () => dayStartMs() + DAY + S.trail * 3600000;
+const minToY = m => (m + S.lead * 60) / 60 * S.hour;                 // minutes from selected-day start → layer px
+const pointerMin = clientY => (clientY - layerEl.getBoundingClientRect().top) / S.hour * 60 - S.lead * 60;
 const minHour = () => Math.max(12, (wrapEl.clientHeight - 110 - 16) / 24);
 
 function renderGrid() {
-  tlEl.style.height = (24 * S.hour + 16) + "px";
-  tlEl.querySelectorAll(".hour-row").forEach(r => r.remove());
+  tlEl.style.height = ((24 + S.lead + S.trail) * S.hour + 16) + "px";
+  tlEl.querySelectorAll(".hour-row, .ext-band").forEach(r => r.remove());
   const dense = S.pinch ? S.pinch.dense : S.hour >= 76;   // density frozen while pinching
   const frag = document.createDocumentFragment();
-  for (let i = 0; i <= 24; i++) {
-    frag.appendChild(h(`<div class="hour-row" style="top:${TOP_PAD + i * S.hour}px"><label>${pad(i % 24)}:00</label></div>`));
-    if (dense && i < 24) frag.appendChild(h(`<div class="hour-row half" style="top:${TOP_PAD + (i + .5) * S.hour}px"><label>${pad(i)}:30</label></div>`));
+  // extension bands for the neighbouring days, with a date chip at the midnight line
+  if (S.lead) frag.appendChild(h(`<div class="ext-band" style="top:${TOP_PAD}px;height:${S.lead * S.hour}px"><span class="ext-chip" style="bottom:4px">↑ ${fmtDate(addDays(S.selected, -1))}</span></div>`));
+  if (S.trail) frag.appendChild(h(`<div class="ext-band" style="top:${TOP_PAD + (S.lead + 24) * S.hour}px;height:${S.trail * S.hour}px"><span class="ext-chip" style="top:4px">↓ ${fmtDate(addDays(S.selected, 1))}</span></div>`));
+  for (let i = -S.lead; i <= 24 + S.trail; i++) {
+    const y = TOP_PAD + minToY(i * 60), ext = i < 0 || i > 24;
+    frag.appendChild(h(`<div class="hour-row ${ext ? "ext" : ""} ${i === 0 || i === 24 ? "midnight" : ""}" style="top:${y}px"><label>${pad(((i % 24) + 24) % 24)}:00</label></div>`));
+    if (dense && i < 24 + S.trail) frag.appendChild(h(`<div class="hour-row half" style="top:${y + S.hour / 2}px"><label>${pad(((i % 24) + 24) % 24)}:30</label></div>`));
   }
   tlEl.insertBefore(frag, tlEl.firstChild);
 }
 
+// Open the neighbouring day above/below when a drag pushes against midnight (single-day view).
+// Content is shifted so nothing jumps under the finger; auto-scroll then carries it across.
+function maybeExtend(g, lo, hi) {
+  const r = wrapEl.getBoundingClientRect(), zone = Math.min(192, r.height * 0.22);
+  const atTop = wrapEl.scrollTop <= 1;
+  const atBot = wrapEl.scrollTop >= wrapEl.scrollHeight - wrapEl.clientHeight - 1;
+  if (!S.lead && (lo < 0 || (lo <= 0 && atTop && g.y - r.top < zone))) {
+    S.lead = 12; renderGrid(); wrapEl.scrollTop += 12 * S.hour; haptic("soft");
+  }
+  if (!S.trail && (hi > 1440 || (hi >= 1440 && atBot && (r.bottom - 24) - g.y < zone))) {
+    S.trail = 12; renderGrid(); haptic("soft");
+  }
+}
+function closeExtensions() {
+  if (!S.lead && !S.trail) return;
+  const shift = S.lead * S.hour;
+  S.lead = 0; S.trail = 0;
+  renderGrid();
+  wrapEl.scrollTop = Math.max(0, wrapEl.scrollTop - shift);
+}
+
 function renderCalendar() {
   const d = S.selected;
-  $("#cal-title").innerHTML = `${d.getMonth() + 1}月${d.getDate()}日<small>周${WEEKDAYS[d.getDay()]}</small>`;
+  $("#cal-title").innerHTML = `${fmtDate(d)}<small>${WEEKDAYS[d.getDay()]}</small>`;
   renderWeek();
   renderEvents();
 }
@@ -556,9 +595,9 @@ function renderWeek() {
   const sun = addDays(startOfDay(S.selected), -S.selected.getDay());
   for (let i = 0; i < 7; i++) {
     const day = addDays(sun, i);
-    const colors = [...new Set(events.filter(e => sameDay(e.start, day) && e.type !== "睡眠").map(e => TYPES[e.type]))].slice(0, 4);
+    const colors = [...new Set(events.filter(e => sameDay(e.start, day) && e.type !== "Sleep").map(e => TYPES[e.type]))].slice(0, 4);
     const el = h(`<div class="wd ${sameDay(day, today) ? "today" : ""} ${sameDay(day, S.selected) ? "sel" : ""}">
-      <div class="w">${WEEKDAYS[i]}</div><div class="n">${day.getDate()}</div>
+      <div class="w">${WD_SHORT[i]}</div><div class="n">${day.getDate()}</div>
       <div class="bars">${colors.map(c => `<span style="background:${c}"></span>`).join("")}</div></div>`);
     el.onclick = () => { if (weekSwiped) return; S.selected = day; renderCalendar(); };
     week.appendChild(el);
@@ -572,9 +611,11 @@ const eventNodes = new Map();
 let draftNode = null, nowNode = null;
 function renderEvents() {
   const dragEv = S.drag && S.drag.ev;
-  const list = events.filter(e => sameDay(e.start, S.selected) && e !== dragEv).sort((a, b) => a.start - b.start);
+  const ws = winStartMs(), we = winEndMs();
+  const inWin = e => e.end > ws && e.start < we;   // cross-midnight events show on both days (clipped)
+  const list = events.filter(e => inWin(e) && e !== dragEv).sort((a, b) => a.start - b.start);
   const placed = layoutOverlaps(list);
-  if (dragEv && sameDay(dragEv.start, S.selected)) placed.push({ ev: dragEv, col: 0, cols: 1 });
+  if (dragEv && inWin(dragEv)) placed.push({ ev: dragEv, col: 0, cols: 1 });
   const seen = new Set();
   placed.forEach(({ ev, col, cols }) => {
     let el = eventNodes.get(ev.id);
@@ -586,11 +627,11 @@ function renderEvents() {
   for (const [eid, el] of eventNodes) if (!seen.has(eid)) { el.remove(); eventNodes.delete(eid); }
 
   if (S.draft && sameDay(S.draft.day, S.selected)) {
-    if (!draftNode) draftNode = h(`<div class="event ghost lifted"><div class="inner"><div class="t">新事件</div><div class="r"></div></div></div>`);
+    if (!draftNode) draftNode = h(`<div class="event ghost lifted"><div class="inner"><div class="t">New Event</div><div class="r"></div></div></div>`);
     if (draftNode.parentNode !== layerEl) layerEl.appendChild(draftNode);
-    const { s, e } = S.draft, color = TYPES["工作"];
+    const { s, e } = S.draft, color = TYPES["Work"];
     Object.assign(draftNode.style, {
-      top: (s / 60 * S.hour) + "px", height: ((e - s) / 60 * S.hour - 2) + "px", left: "2px", width: "calc(100% - 4px)",
+      top: minToY(s) + "px", height: ((e - s) / 60 * S.hour - 2) + "px", left: "2px", width: "calc(100% - 4px)",
       background: hexA(color, 0.15), borderColor: hexA(color, 0.6),
     });
     draftNode.querySelector(".r").textContent = `${fmtMin(s)}–${fmtMin(e)}`;
@@ -599,7 +640,7 @@ function renderEvents() {
   if (sameDay(S.selected, today)) {
     if (!nowNode) nowNode = h(`<div class="now-line"></div>`);
     if (nowNode.parentNode !== layerEl) layerEl.appendChild(nowNode);
-    nowNode.style.top = ((new Date() - dayStartMs()) / 3600000 * S.hour) + "px";
+    nowNode.style.top = minToY((new Date() - dayStartMs()) / 60000) + "px";
   } else nowNode?.remove();
 }
 
@@ -612,9 +653,10 @@ function createEventNode(ev) {
 }
 
 function patchEventNode(el, ev, col, cols) {
-  const ds = dayStartMs();
-  const top = (ev.start - ds) / 3600000 * S.hour;
-  const height = (ev.end - ev.start) / 3600000 * S.hour;   // no minimum height (app convention)
+  const ws = winStartMs(), we = winEndMs();
+  const vs = Math.max(+ev.start, ws), ve = Math.min(+ev.end, we);   // clip to the visible window
+  const top = (vs - ws) / 3600000 * S.hour;
+  const height = (ve - vs) / 3600000 * S.hour;   // no minimum height (app convention)
   const color = TYPES[ev.type] || "#8E8E93";
   const focused = S.focusedId === ev.id;
   const dragging = S.drag && S.drag.ev === ev;
@@ -627,9 +669,12 @@ function patchEventNode(el, ev, col, cols) {
   if (!showH) cl.remove("fading");
   cl.toggle("show-handles", !!showH);
   cl.toggle("resizing", !!resizing);
+  cl.toggle("cont-top", +ev.start < ws);      // continues from the previous day
+  cl.toggle("cont-bottom", +ev.end > we);     // continues into the next day
   const t = el.querySelector(".t"), r = el.querySelector(".r");
   if (t.textContent !== ev.title) t.textContent = ev.title;
-  r.textContent = `${fmtTime(ev.start)}–${fmtTime(ev.end)}`;
+  const crosses = !sameDay(ev.start, new Date(+ev.end - 1));
+  r.textContent = `${fmtTime(ev.start)}–${fmtTime(ev.end)}${crosses ? (+ev.start < dayStartMs() ? " (from prev day)" : " (+1 day)") : ""}`;
   r.style.display = height > 34 ? "" : "none";
   el.querySelectorAll(".handle").forEach(hd => hd.style.display = height >= 32 || resizing ? "" : "none");
   el.querySelector(".inner").style.padding = height < 18 ? "0 6px" : "";
@@ -815,10 +860,13 @@ function updateDrag(g) {
   let s, en;
   if (d.kind === "move") {
     const dur = (d.ev.end - d.ev.start) / 60000;
-    s = clamp(snap15(pm - d.grabMin), 0, 1440 - dur); en = s + dur;
+    const raw = snap15(pm - d.grabMin);
+    maybeExtend(g, raw, raw + dur);
+    s = clamp(snap15(pointerMin(g.y) - d.grabMin), -S.lead * 60, 1440 + S.trail * 60 - dur); en = s + dur;
     checkEdgeDwell(g);
   } else {
-    const m = clamp(snap15(pm), 0, 1440);
+    maybeExtend(g, snap15(pm), snap15(pm));
+    const m = clamp(snap15(pointerMin(g.y)), -S.lead * 60, 1440 + S.trail * 60);
     d.lastM = m;
     s = Math.min(m, d.fixedMin); en = Math.max(m, d.fixedMin);   // edge may cross the other edge
   }
@@ -830,7 +878,7 @@ function updateDrag(g) {
   renderEvents();
   const edge = d.kind === "move" ? s : d.lastM;
   hintEl.style.display = "block";
-  hintEl.style.top = (TOP_PAD + edge / 60 * S.hour - 6) + "px";
+  hintEl.style.top = (TOP_PAD + minToY(edge) - 6) + "px";
   hintEl.textContent = fmtMin(edge);
 }
 
@@ -838,25 +886,31 @@ function commitDrag(g) {
   const d = S.drag; S.drag = null;
   if (d.kind === "create") {
     const ds = startOfDay(S.draft.day).getTime();
-    renderEvents();
-    openForm({ start: new Date(ds + S.draft.s * 60000), end: new Date(ds + S.draft.e * 60000), onClose: clearDraft });
+    renderEvents();   // extension stays open under the ghost until the sheet closes
+    openForm({ start: new Date(ds + S.draft.s * 60000), end: new Date(ds + S.draft.e * 60000), onClose: () => { clearDraft(); closeExtensions(); renderEvents(); } });
     return;
   }
   if (d.kind !== "move") {
     // enforce ≥ 15 min, growing away from the edge that stayed put
-    const ds = startOfDay(d.ev.start).getTime();
+    const ds = dayStartMs();
     let s = (d.ev.start - ds) / 60000, en = (d.ev.end - ds) / 60000;
     if (en - s < 15) {
       const above = d.lastM < d.fixedMin || (d.lastM === d.fixedMin && d.kind === "resizeTop");
       if (above) { s = d.fixedMin - 15; en = d.fixedMin; } else { s = d.fixedMin; en = d.fixedMin + 15; }
-      if (s < 0) { s = 0; en = 15; } if (en > 1440) { en = 1440; s = 1425; }
       d.ev.start = new Date(ds + s * 60000); d.ev.end = new Date(ds + en * 60000);
     }
+  }
+  closeExtensions();
+  // dropped wholly into the neighbouring day → follow it there
+  if (+d.ev.end <= dayStartMs() || +d.ev.start >= dayStartMs() + DAY) {
+    S.selected = startOfDay(d.ev.start);
+    renderCalendar();
+    wrapEl.scrollTop = Math.max(0, minToY((d.ev.start - dayStartMs()) / 60000 - 60));
   }
   renderCalendar(); updateFocusChrome();
   if (+d.orig.start !== +d.ev.start || +d.orig.end !== +d.ev.end) {
     toast(d.kind === "move"
-      ? `已移到 ${d.ev.start.getMonth() + 1}/${d.ev.start.getDate()} ${fmtTime(d.ev.start)}`
+      ? `Moved to ${fmtDate(d.ev.start)}, ${fmtTime(d.ev.start)}`
       : `${fmtTime(d.ev.start)}–${fmtTime(d.ev.end)} · ${fmtDur(d.ev.end - d.ev.start)}`);
   }
 }
@@ -866,6 +920,7 @@ function revertDrag() {
   S.drag = null;
   if (d.kind === "create") { S.draft = null; }
   else { d.ev.start = d.orig.start; d.ev.end = d.orig.end; S.selected = startOfDay(d.ev.start); }
+  closeExtensions();
   renderCalendar();
 }
 
@@ -878,6 +933,7 @@ function checkEdgeDwell(g) {
   if (!dir) return;
   const turn = () => {
     if (!S.drag || S.drag.kind !== "move") return;
+    closeExtensions();
     S.selected = addDays(S.selected, dir);
     S.drag.ev.start = addDays(S.drag.ev.start, dir); S.drag.ev.end = addDays(S.drag.ev.end, dir);
     S.drag.lastKey = null;
@@ -927,11 +983,12 @@ function activateCreate(g) {
 }
 function updateCreate(g) {
   const d = S.drag, dr = S.draft;
-  const pm = clamp(pointerMin(g.y), 0, 1440);
+  maybeExtend(g, snap15(pointerMin(g.y)), snap15(pointerMin(g.y)));
+  const pm = clamp(pointerMin(g.y), -S.lead * 60, 1440 + S.trail * 60);
   // stick to a neighbouring event's start/end within 8px, else 15-min snap
   let m = snap15(pm), edge = null;
   for (const ev of events) {
-    if (!sameDay(ev.start, S.selected)) continue;
+    if (!(ev.end > winStartMs() && ev.start < winEndMs())) continue;
     for (const t of [ev.start, ev.end]) {
       const em = (t - dayStartMs()) / 60000;
       if (Math.abs((em - pm) / 60 * S.hour) <= 8) { m = em; edge = em; }
@@ -940,7 +997,8 @@ function updateCreate(g) {
   if (edge !== null && edge !== d.snappedEdge) haptic("select");
   d.snappedEdge = edge;
   let s = Math.min(dr.anchor, m), e = Math.max(dr.anchor, m);
-  if (e - s < 15) { e = s + 15; if (e > 1440) { e = 1440; s = 1425; } }
+  const hiLim = 1440 + S.trail * 60;
+  if (e - s < 15) { e = s + 15; if (e > hiLim) { e = hiLim; s = hiLim - 15; } }
   const key = s + "-" + e;
   if (key === d.lastKey) return;
   if (d.lastKey && edge === null) haptic("tick");
@@ -1106,7 +1164,7 @@ const pull = {
   show(vis) {
     this.vis = vis;
     if (!rpInner.querySelector(".rp-pull")) { rpInner.innerHTML = ""; rpInner.appendChild(h(`<div class="rp-pull"></div>`)); }
-    rpInner.querySelector(".rp-pull").textContent = vis > 70 ? "松手打开提醒" : "下拉打开提醒";
+    rpInner.querySelector(".rp-pull").textContent = vis > 70 ? "Release to open reminders" : "Pull to open reminders";
     if (vis > 70 && !this.ready) { haptic("light"); this.ready = true; } else if (vis <= 70) this.ready = false;
     setPanel(vis, false);
   },
@@ -1132,11 +1190,11 @@ wrapEl.addEventListener("touchend", () => { if (pull.active) pull.release(); });
 
 function renderPanel() {
   rpInner.innerHTML = "";
-  const head = h(`<div class="rp-head"><span class="headline">提醒</span><span class="caption">${reminders.filter(r => !r.done).length} 项待办</span><div class="grab"></div></div>`);
+  const head = h(`<div class="rp-head"><span class="headline">Reminders</span><span class="caption">${reminders.filter(r => !r.done).length} to do</span><div class="grab"></div></div>`);
   attachPanelHeadDrag(head);
   const list = h(`<div class="rp-list"></div>`);
   reminders.forEach(r => list.appendChild(reminderRow(r)));
-  const compose = h(`<div class="rp-compose"><span style="color:var(--accent);font-size:20px;line-height:1">+</span><input class="text" placeholder="新提醒，回车添加" /></div>`);
+  const compose = h(`<div class="rp-compose"><span style="color:var(--accent);font-size:20px;line-height:1">+</span><input class="text" placeholder="New reminder, press Enter" /></div>`);
   compose.querySelector("input").onkeydown = ev => {
     if (ev.key !== "Enter" || !ev.target.value.trim()) return;
     reminders.push({ id: id(), title: ev.target.value.trim(), done: false });
@@ -1169,7 +1227,7 @@ function attachPanelHeadDrag(head) {
 // Row: tap title → rename inline · swipe left → delete (full swipe deletes) · long-press/right-click → menu
 function reminderRow(r) {
   const row = h(`<div class="rp-row ${r.done ? "done" : ""}">
-    <div class="rp-del">删除</div>
+    <div class="rp-del">Delete</div>
     <div class="rp-content"><div class="small-check">${r.done ? "✓" : ""}</div><div class="rp-title">${esc(r.title)}</div></div></div>`);
   const content = row.querySelector(".rp-content");
   const del = () => { row.classList.add("gone"); setTimeout(() => { reminders.splice(reminders.indexOf(r), 1); renderPanel(); setPanel(panelHeight(), true); }, 250); };
@@ -1212,9 +1270,9 @@ function renameInline(r, el) {
 }
 function reminderMenu(r, x, y) {
   showMenuAt([
-    { label: "加入日程", icon: "📅", run: () => { const s = nextHour(); openForm({ start: s, end: new Date(+s + 3600000), title: r.title, type: "个人", onCreate: () => { r.done = true; if (S.panelOpen) renderPanel(); } }); } },
-    { label: r.done ? "标为未完成" : "标为完成", icon: "✓", run: () => { r.done = !r.done; renderPanel(); } },
-    { label: "删除", icon: "🗑", danger: true, run: () => { reminders.splice(reminders.indexOf(r), 1); renderPanel(); setPanel(panelHeight(), true); } },
+    { label: "Add to Schedule", icon: "📅", run: () => { const s = nextHour(); openForm({ start: s, end: new Date(+s + 3600000), title: r.title, type: "Personal", onCreate: () => { r.done = true; if (S.panelOpen) renderPanel(); } }); } },
+    { label: r.done ? "Mark as Not Done" : "Mark as Done", icon: "✓", run: () => { r.done = !r.done; renderPanel(); } },
+    { label: "Delete", icon: "🗑", danger: true, run: () => { reminders.splice(reminders.indexOf(r), 1); renderPanel(); setPanel(panelHeight(), true); } },
   ], x, y);
 }
 
@@ -1241,7 +1299,7 @@ function reminderMenu(r, x, y) {
 })();
 function jumpToNow() {
   haptic("success");
-  S.selected = new Date(today); clearFocus(); renderCalendar(); scrollToNow(); toast("回到现在");
+  S.selected = new Date(today); clearFocus(); renderCalendar(); scrollToNow(); toast("Back to now");
 }
 $("#btn-today").onclick = () => { S.selected = new Date(today); renderCalendar(); scrollToNow(); };
 
@@ -1273,7 +1331,7 @@ let weekSwiped = false;
 
 $("#fab").onclick = () => { const s = nextHour(S.selected); openForm({ start: s, end: new Date(+s + 3600000) }); };
 function nextHour(day = new Date()) { const n = new Date(); const s = startOfDay(day); s.setHours(Math.min(23, n.getHours() + 1)); return s; }
-function scrollToNow(smooth = true) { wrapEl.scrollTo({ top: Math.max(0, (new Date().getHours() - 2) * S.hour), behavior: smooth ? "smooth" : "instant" }); }
+function scrollToNow(smooth = true) { wrapEl.scrollTo({ top: Math.max(0, minToY((new Date().getHours() - 2) * 60)), behavior: smooth ? "smooth" : "instant" }); }
 
 /* ============================================================
    Express menu (long-press 1s on an event)
@@ -1300,19 +1358,19 @@ phone.addEventListener("pointerdown", e => { if (S.menu && !S.menu.contains(e.ta
 
 function showEventMenu(ev, x, y) {
   showMenuAt([
-    { label: "查看详情", icon: "ⓘ", run: () => openDetail(ev) },
-    { label: "中断", icon: "⏸", run: () => toast("已开始一次中断（demo）") },
-    { label: "记录 Log", icon: "✎", run: () => openDetail(ev) },
-    { label: "编辑", icon: "⚙︎", run: () => openForm({ editing: ev }) },
-    { label: "分享", icon: "↗", run: () => { navigator.clipboard?.writeText(`${ev.title} · ${fmtTime(ev.start)}–${fmtTime(ev.end)}`).catch(() => {}); toast("已复制到剪贴板"); } },
-    { label: "删除", icon: "🗑", danger: true, run: () => deleteEvent(ev) },
+    { label: "View Details", icon: "ⓘ", run: () => openDetail(ev) },
+    { label: "Interrupt", icon: "⏸", run: () => toast("Interruption started (demo)") },
+    { label: "Log Event", icon: "✎", run: () => openDetail(ev) },
+    { label: "Edit", icon: "⚙︎", run: () => openForm({ editing: ev }) },
+    { label: "Share", icon: "↗", run: () => { navigator.clipboard?.writeText(`${ev.title} · ${fmtTime(ev.start)}–${fmtTime(ev.end)}`).catch(() => {}); toast("Copied to clipboard"); } },
+    { label: "Delete", icon: "🗑", danger: true, run: () => deleteEvent(ev) },
   ], x, y);
 }
 function deleteEvent(ev) {
   events.splice(events.indexOf(ev), 1);
   wannas.forEach(w => { if (w.scheduledId === ev.id) w.scheduledId = null; });
   if (S.focusedId === ev.id) S.focusedId = null;
-  updateFocusChrome(); renderCalendar(); toast("已删除");
+  updateFocusChrome(); renderCalendar(); toast("Deleted");
 }
 
 document.addEventListener("keydown", e => {
@@ -1336,7 +1394,7 @@ let sheetCfg = null;
 function openSheet(title, body, cfg = {}) {
   closeMenu();
   $("#sheet-title").textContent = title;
-  $("#sheet-ok").textContent = cfg.ok || "完成";
+  $("#sheet-ok").textContent = cfg.ok || "Done";
   const b = $("#sheet-body"); b.innerHTML = ""; b.appendChild(body); b.scrollTop = 0;
   sheetCfg = cfg;
   sheetEl.style.transform = "";
@@ -1400,20 +1458,20 @@ function openDetail(ev) {
   const log = ev.log ? structuredClone(ev.log) : { status: null, effort: 0, emotions: [], note: "" };
   const body = h(`<div style="display:flex;flex-direction:column;gap:12px"></div>`);
   const ds = startOfDay(ev.start).getTime();
-  const pct = v => ((v - ds) / DAY * 100).toFixed(2) + "%";
+  const pct = v => clamp((v - ds) / DAY * 100, 0, 100).toFixed(2) + "%";
   body.appendChild(h(`<div class="card glass">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
       <span class="dot" style="background:${color};width:10px;height:10px;border-radius:5px"></span>
       <span class="headline">${esc(ev.title)}</span>
     </div>
-    <div class="caption mono">${ev.start.getMonth() + 1}月${ev.start.getDate()}日 · ${fmtTime(ev.start)} – ${fmtTime(ev.end)} · ${fmtDur(ev.end - ev.start)}</div>
+    <div class="caption mono">${fmtDate(ev.start)} · ${fmtTime(ev.start)} – ${fmtTime(ev.end)} · ${fmtDur(ev.end - ev.start)}</div>
     <div style="position:relative;height:18px;margin-top:12px;border-radius:6px;background:color-mix(in srgb,var(--primary) 6%,transparent)">
       <div style="position:absolute;top:0;bottom:0;left:${pct(ev.start)};width:calc(${pct(ev.end)} - ${pct(ev.start)});border-radius:6px;background:${hexA(color, .5)};border:1.2px solid ${hexA(color, .9)}"></div>
     </div>
     <div style="display:flex;justify-content:space-between;margin-top:4px" class="caption mono"><span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>24:00</span></div>
   </div>`));
 
-  const statusCard = h(`<div class="card glass field"><div class="lbl">完成情况</div><div class="flow"></div></div>`);
+  const statusCard = h(`<div class="card glass field"><div class="lbl">Completion</div><div class="flow"></div></div>`);
   Object.entries(STATUS).forEach(([k, label]) => {
     const c = h(`<div class="chip ${log.status === k ? "on" : ""}" style="font-size:12px;font-weight:600">${label}</div>`);
     c.onclick = () => { log.status = k; statusCard.querySelectorAll(".chip").forEach(x => x.classList.remove("on")); c.classList.add("on"); };
@@ -1421,11 +1479,11 @@ function openDetail(ev) {
   });
   body.appendChild(statusCard);
 
-  const effortCard = h(`<div class="card glass field"><div class="lbl">投入程度 <span class="caption" style="font-weight:400">点或拖</span></div></div>`);
+  const effortCard = h(`<div class="card glass field"><div class="lbl">Effort <span class="caption" style="font-weight:400">tap or drag</span></div></div>`);
   effortCard.appendChild(effortScrubber(log.effort, v => log.effort = v));
   body.appendChild(effortCard);
 
-  const emoCard = h(`<div class="card glass field"><div class="lbl">情绪</div><div class="flow"></div></div>`);
+  const emoCard = h(`<div class="card glass field"><div class="lbl">Emotions</div><div class="flow"></div></div>`);
   EMOTIONS.forEach(em => {
     const c = h(`<div class="chip tag ${log.emotions.includes(em) ? "on" : ""}">${em}</div>`);
     c.onclick = () => { const i = log.emotions.indexOf(em); i >= 0 ? log.emotions.splice(i, 1) : log.emotions.push(em); c.classList.toggle("on"); };
@@ -1433,64 +1491,65 @@ function openDetail(ev) {
   });
   body.appendChild(emoCard);
 
-  const noteCard = h(`<div class="card glass field"><div class="lbl">笔记</div><textarea class="text" rows="3" placeholder="今天这件事做得怎么样？">${esc(log.note || "")}</textarea></div>`);
+  const noteCard = h(`<div class="card glass field"><div class="lbl">Notes</div><textarea class="text" rows="3" placeholder="How did it go?">${esc(log.note || "")}</textarea></div>`);
   noteCard.querySelector("textarea").oninput = e => log.note = e.target.value;
   body.appendChild(noteCard);
 
-  const del = h(`<div class="destructive glass">删除事件</div>`);
+  const del = h(`<div class="destructive glass">Delete Event</div>`);
   del.onclick = () => { closeSheet(); deleteEvent(ev); };
   body.appendChild(del);
 
-  openSheet("事件详情", body, {
-    ok: "保存",
-    onOk: () => { if (log.status || log.effort || log.emotions.length || log.note) ev.log = log; renderCalendar(); toast("Log 已保存"); },
+  openSheet("Event Details", body, {
+    ok: "Save",
+    onOk: () => { if (log.status || log.effort || log.emotions.length || log.note) ev.log = log; renderCalendar(); toast("Log saved"); },
   });
 }
 
 function timeSelect(min, onChange, allowEnd) {
   const sel = h(`<select class="time-pill glass"></select>`);
-  for (let m = allowEnd ? 15 : 0; m <= (allowEnd ? 1440 : 1425); m += 15) {
+  const lo = allowEnd ? 15 : 0, hi = allowEnd ? 2880 : 1425;
+  for (let m = lo; m <= hi; m += 15) {
     const o = document.createElement("option");
-    o.value = m; o.textContent = fmtMin(m === 1440 ? 1440 : m).replace("24:00", "24:00");
+    o.value = m; o.textContent = m === 1440 ? "24:00" : fmtMin(m) + (m > 1440 ? " +1" : "");
     sel.appendChild(o);
   }
-  sel.value = clamp(snap15(min), allowEnd ? 15 : 0, allowEnd ? 1440 : 1425);
+  sel.value = clamp(snap15(min), lo, hi);
   sel.onchange = () => onChange(+sel.value);
   return sel;
 }
 
-function openForm({ start, end, title = "", type = "工作", editing = null, onCreate, onClose }) {
+function openForm({ start, end, title = "", type = "Work", editing = null, onCreate, onClose }) {
   if (editing) { start = editing.start; end = editing.end; title = editing.title; type = editing.type; }
   const ds = startOfDay(start).getTime();
   const draft = { title, type, s: (start - ds) / 60000, e: (end - ds) / 60000 };
   const body = h(`<div style="display:flex;flex-direction:column;gap:12px"></div>`);
-  const titleCard = h(`<div class="card glass field"><div class="lbl">标题</div><input class="text" placeholder="要做什么？" value="${esc(title)}"></div>`);
+  const titleCard = h(`<div class="card glass field"><div class="lbl">Title</div><input class="text" placeholder="What are you doing?" value="${esc(title)}"></div>`);
   titleCard.querySelector("input").oninput = e => draft.title = e.target.value;
   body.appendChild(titleCard);
-  const tc = h(`<div class="card glass field"><div class="lbl">类型</div></div>`);
+  const tc = h(`<div class="card glass field"><div class="lbl">Type</div></div>`);
   tc.appendChild(typeChips(type, t => draft.type = t));
   body.appendChild(tc);
-  const timeCard = h(`<div class="card glass field"><div class="lbl">时间</div><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"></div></div>`);
+  const timeCard = h(`<div class="card glass field"><div class="lbl">Time</div><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"></div></div>`);
   const row = timeCard.querySelector("div:last-child");
   const d0 = new Date(ds);
-  row.appendChild(h(`<span class="time-pill glass">${d0.getMonth() + 1}月${d0.getDate()}日</span>`));
+  row.appendChild(h(`<span class="time-pill glass">${fmtDate(d0)}</span>`));
   const endSel = timeSelect(draft.e, m => draft.e = m, true);
-  row.appendChild(timeSelect(draft.s, m => { const dur = draft.e - draft.s; draft.s = m; draft.e = Math.min(1440, m + dur); endSel.value = draft.e; }));
-  row.appendChild(h(`<span class="caption">至</span>`));
+  row.appendChild(timeSelect(draft.s, m => { const dur = draft.e - draft.s; draft.s = m; draft.e = Math.min(2880, m + dur); endSel.value = draft.e; }));
+  row.appendChild(h(`<span class="caption">to</span>`));
   row.appendChild(endSel);
   body.appendChild(timeCard);
 
-  openSheet(editing ? "编辑事件" : "新事件", body, {
-    ok: editing ? "保存" : "添加", onClose,
+  openSheet(editing ? "Edit Event" : "New Event", body, {
+    ok: editing ? "Save" : "Add", onClose,
     onOk: () => {
-      if (!draft.title.trim()) { toast("先写个标题"); return false; }
-      if (draft.e <= draft.s) { toast("结束时间要晚于开始"); return false; }
+      if (!draft.title.trim()) { toast("Add a title first"); return false; }
+      if (draft.e <= draft.s) { toast("End time must be after start"); return false; }
       const s = new Date(ds + draft.s * 60000), en = new Date(ds + draft.e * 60000);
       if (editing) Object.assign(editing, { title: draft.title.trim(), type: draft.type, start: s, end: en });
       else { const ev = mkEvent(draft.title.trim(), draft.type, s, en, null); events.push(ev); onCreate?.(ev); S.selected = startOfDay(s); }
       S.draft = null;
       if (currentTab === "calendar") renderCalendar();
-      toast(editing ? "已保存" : "已添加到日历");
+      toast(editing ? "Saved" : "Added to calendar");
     },
   });
   if (!editing && !title) setTimeout(() => titleCard.querySelector("input").focus({ preventScroll: true }), 350);
@@ -1510,16 +1569,16 @@ $("#wanna-page").addEventListener("touchmove", e => { if (WG && (WG.mode === "sw
 
 function renderWanna() {
   const page = $("#wanna-page"); page.innerHTML = "";
-  const head = h(`<div class="page-title">想做<div class="icon-btn glass" style="font-size:24px;font-weight:400">+</div></div>`);
+  const head = h(`<div class="page-title">Wanna<div class="icon-btn glass" style="font-size:24px;font-weight:400">+</div></div>`);
   head.querySelector(".icon-btn").onclick = () => openWannaForm();
   page.appendChild(head);
   const active = wannas.filter(w => !w.done), done = wannas.filter(w => w.done);
-  page.appendChild(h(`<div class="caption" style="padding:0 4px">${active.length} 件想做的事 · 左滑排期/删除，右滑缩进，长按拖动排序</div>`));
+  page.appendChild(h(`<div class="caption" style="padding:0 4px">${active.length} things you want to do · swipe left to schedule/delete, right to indent, long-press to reorder</div>`));
   const list = h(`<div class="w-list" id="w-list"></div>`);
   active.forEach(w => list.appendChild(wannaRow(w)));
   page.appendChild(list);
   if (done.length) {
-    page.appendChild(h(`<div class="section-label">已完成</div>`));
+    page.appendChild(h(`<div class="section-label">Done</div>`));
     const dl = h(`<div class="w-list"></div>`);
     done.forEach(w => dl.appendChild(wannaRow(w)));
     page.appendChild(dl);
@@ -1544,7 +1603,7 @@ function wannaRow(w) {
     </div></div>`);
   const card = row.querySelector(".wanna-card");
   row.querySelector(".check").addEventListener("click", e => {
-    e.stopPropagation(); w.done = !w.done; if (w.done) { haptic("success"); toast("🎉 完成一件想做的事"); } renderWanna();
+    e.stopPropagation(); w.done = !w.done; if (w.done) { haptic("success"); toast("🎉 One more thing done"); } renderWanna();
   });
   if (w.done) { card.addEventListener("click", e => { if (!e.target.closest(".check")) openWannaForm(w); }); return row; }
 
@@ -1559,7 +1618,7 @@ function wannaRow(w) {
   const closeTray = () => { row._open = false; card.classList.remove("dragging"); acts.forEach(a => a.style.transition = "all .3s"); setReveal(0); };
   const runAfterClose = fn => { closeTray(); setTimeout(fn, 100); };
   acts[0].onclick = e => { e.stopPropagation(); runAfterClose(() => toggleSchedule(w)); };
-  acts[1].onclick = e => { e.stopPropagation(); runAfterClose(() => { wannas.splice(wannas.indexOf(w), 1); wannas.forEach(x => { if (x.parentId === w.id) x.parentId = null; }); renderWanna(); toast("已删除"); }); };
+  acts[1].onclick = e => { e.stopPropagation(); runAfterClose(() => { wannas.splice(wannas.indexOf(w), 1); wannas.forEach(x => { if (x.parentId === w.id) x.parentId = null; }); renderWanna(); toast("Deleted"); }); };
 
   card.addEventListener("pointerdown", e => {
     if (e.button > 0 || e.target.closest(".check")) return;
@@ -1613,16 +1672,16 @@ function wannaRow(w) {
 function toggleIndent(w) {
   const active = wannas.filter(x => !x.done);
   if (w.parentId) { w.parentId = null; haptic("light"); renderWanna(); return; }
-  if (active.some(x => x.parentId === w.id)) { toast("有子项的不能再缩进"); return; }
+  if (active.some(x => x.parentId === w.id)) { toast("Items with sub-items can't be indented"); return; }
   const idx = active.indexOf(w);
   const parent = active.slice(0, idx).reverse().find(x => !x.parentId);
-  if (!parent) { toast("上面没有可以挂靠的项"); return; }
+  if (!parent) { toast("Nothing above to nest under"); return; }
   w.parentId = parent.id; haptic("light"); renderWanna();
 }
 
 function toggleSchedule(w) {
   const sched = w.scheduledId && events.find(e => e.id === w.scheduledId);
-  if (sched) { events.splice(events.indexOf(sched), 1); w.scheduledId = null; renderWanna(); toast("已从日历撤回"); return; }
+  if (sched) { events.splice(events.indexOf(sched), 1); w.scheduledId = null; renderWanna(); toast("Removed from calendar"); return; }
   const s = nextHour();
   openForm({ start: s, end: new Date(+s + 3600000), title: w.title, type: w.type, onCreate: ev => { w.scheduledId = ev.id; setTimeout(renderWanna, 0); } });
 }
@@ -1675,17 +1734,17 @@ function finishReorder(g) {
 }
 
 function openWannaForm(w) {
-  const draft = w ? { ...w } : { title: "", type: "个人", note: "" };
+  const draft = w ? { ...w } : { title: "", type: "Personal", note: "" };
   const body = h(`<div style="display:flex;flex-direction:column;gap:12px"></div>`);
-  const t = h(`<div class="card glass field"><div class="lbl">想做什么</div><input class="text" placeholder="比如：学会游泳" value="${esc(draft.title)}"></div>`);
+  const t = h(`<div class="card glass field"><div class="lbl">What do you want to do?</div><input class="text" placeholder="e.g. Learn to swim" value="${esc(draft.title)}"></div>`);
   t.querySelector("input").oninput = e => draft.title = e.target.value;
-  const n = h(`<div class="card glass field"><div class="lbl">备注</div><input class="text" placeholder="可选" value="${esc(draft.note)}"></div>`);
+  const n = h(`<div class="card glass field"><div class="lbl">Note</div><input class="text" placeholder="Optional" value="${esc(draft.note)}"></div>`);
   n.querySelector("input").oninput = e => draft.note = e.target.value;
-  const tc = h(`<div class="card glass field"><div class="lbl">类型</div></div>`);
+  const tc = h(`<div class="card glass field"><div class="lbl">Type</div></div>`);
   tc.appendChild(typeChips(draft.type, x => draft.type = x));
   body.append(t, tc, n);
-  openSheet(w ? "想做" : "新想做", body, { ok: w ? "保存" : "添加", onOk: () => {
-    if (!draft.title.trim()) { toast("先写点什么"); return false; }
+  openSheet(w ? "Wanna" : "New Wanna", body, { ok: w ? "Save" : "Add", onOk: () => {
+    if (!draft.title.trim()) { toast("Write something first"); return false; }
     if (w) Object.assign(w, { title: draft.title.trim(), type: draft.type, note: draft.note });
     else wannas.unshift({ id: id(), title: draft.title.trim(), type: draft.type, note: draft.note, done: false, parentId: null, scheduledId: null });
     renderWanna();
@@ -1721,7 +1780,7 @@ function changePeriod(delta) {   // +1 = older week, -1 = newer
   const next = S.reportOffset + delta;
   const body = $("#report-page .report-body");
   if (next < 0 || next > 3) {
-    toast(next < 0 ? "已经是最新一周" : "更早的数据 demo 里没有");
+    toast(next < 0 ? "Already the latest week" : "No earlier data in this demo");
     if (body) { body.style.transition = ""; body.style.transform = ""; body.style.opacity = ""; }
     return;
   }
@@ -1736,14 +1795,14 @@ function changePeriod(delta) {   // +1 = older week, -1 = newer
 
 function renderReport() {
   const page = $("#report-page"); page.innerHTML = "";
-  page.appendChild(h(`<div class="page-title">报告</div>`));
+  page.appendChild(h(`<div class="page-title">Report</div>`));
   const end = addDays(today, 1 - S.reportOffset * 7), weekStart = addDays(end, -7);
   const now = new Date();
   const inWeek = events.filter(e => e.start >= weekStart && e.start < end && e.end <= now);
   const logged = inWeek.filter(e => e.log);
-  const nonSleep = inWeek.filter(e => e.type !== "睡眠");
+  const nonSleep = inWeek.filter(e => e.type !== "Sleep");
   const hours = nonSleep.reduce((s, e) => s + (e.end - e.start), 0) / 3600000;
-  const efforts = logged.filter(e => e.log.effort && e.type !== "睡眠").map(e => e.log.effort);
+  const efforts = logged.filter(e => e.log.effort && e.type !== "Sleep").map(e => e.log.effort);
   const avgEffort = efforts.length ? efforts.reduce((a, b) => a + b, 0) / efforts.length : 0;
   const completion = logged.length ? logged.filter(e => e.log.status === "completed").length / logged.length : 0;
   const deep = nonSleep.filter(e => e.log?.effort >= 4).reduce((s, e) => s + (e.end - e.start), 0) / 3600000;
@@ -1751,8 +1810,8 @@ function renderReport() {
 
   const period = h(`<div class="period">
       <div class="icon-btn glass" data-d="1">‹</div>
-      <div style="text-align:center"><div class="headline">${S.reportOffset === 0 ? "最近 7 天" : S.reportOffset + " 周前"}</div>
-      <div class="caption mono">${weekStart.getMonth() + 1}/${weekStart.getDate()} – ${last.getMonth() + 1}/${last.getDate()} · 左右滑切换</div></div>
+      <div style="text-align:center"><div class="headline">${S.reportOffset === 0 ? "Last 7 Days" : S.reportOffset + (S.reportOffset === 1 ? " week ago" : " weeks ago")}</div>
+      <div class="caption mono">${fmtDate(weekStart)} – ${fmtDate(last)} · swipe to change</div></div>
       <div class="icon-btn glass" data-d="-1" style="${S.reportOffset === 0 ? "opacity:.3" : ""}">›</div></div>`);
   period.querySelectorAll(".icon-btn").forEach(b => b.onclick = () => changePeriod(+b.dataset.d));
   page.appendChild(period);
@@ -1760,28 +1819,28 @@ function renderReport() {
   const body = h(`<div class="report-body"></div>`);
   page.appendChild(body);
   body.appendChild(h(`<div class="stat-grid">
-    <div class="card glass stat"><div class="caption">记录时长</div><div class="v">${hours.toFixed(1)}<span class="caption"> h</span></div></div>
-    <div class="card glass stat"><div class="caption">高投入时长</div><div class="v">${deep.toFixed(1)}<span class="caption"> h</span></div></div>
-    <div class="card glass stat"><div class="caption">平均投入</div><div class="v">${avgEffort.toFixed(1)}<span class="caption"> / 5</span></div></div>
-    <div class="card glass stat"><div class="caption">完成率</div><div class="v">${Math.round(completion * 100)}<span class="caption"> %</span></div></div>
+    <div class="card glass stat"><div class="caption">Tracked</div><div class="v">${hours.toFixed(1)}<span class="caption"> h</span></div></div>
+    <div class="card glass stat"><div class="caption">High Effort</div><div class="v">${deep.toFixed(1)}<span class="caption"> h</span></div></div>
+    <div class="card glass stat"><div class="caption">Avg Effort</div><div class="v">${avgEffort.toFixed(1)}<span class="caption"> / 5</span></div></div>
+    <div class="card glass stat"><div class="caption">Completion</div><div class="v">${Math.round(completion * 100)}<span class="caption"> %</span></div></div>
   </div>`));
 
   const days = [...Array(7)].map((_, i) => addDays(weekStart, i));
   const perDay = days.map(d => { const by = {}; nonSleep.filter(e => sameDay(e.start, d)).forEach(e => by[e.type] = (by[e.type] || 0) + (e.end - e.start) / 3600000); return by; });
   const maxDay = Math.max(1, ...perDay.map(b => Object.values(b).reduce((a, c) => a + c, 0)));
-  const chart = h(`<div class="card glass"><div class="headline" style="margin-bottom:12px">每日分布</div><div class="week-chart"></div><div class="wc-lbl"></div></div>`);
+  const chart = h(`<div class="card glass"><div class="headline" style="margin-bottom:12px">Daily Breakdown</div><div class="week-chart"></div><div class="wc-lbl"></div></div>`);
   perDay.forEach((by, i) => {
     const col = h(`<div class="wc-col"></div>`);
     Object.keys(TYPES).filter(t => by[t]).forEach(t => col.appendChild(h(`<span style="background:${TYPES[t]};height:0" data-h="${by[t] / maxDay * 100}%" title="${t} ${by[t].toFixed(1)}h"></span>`)));
     chart.querySelector(".week-chart").appendChild(col);
-    chart.querySelector(".wc-lbl").appendChild(h(`<div>${sameDay(days[i], today) ? "今" : WEEKDAYS[days[i].getDay()]}</div>`));
+    chart.querySelector(".wc-lbl").appendChild(h(`<div>${sameDay(days[i], today) ? "Today" : WEEKDAYS[days[i].getDay()]}</div>`));
   });
   body.appendChild(chart);
 
   const byType = {};
   nonSleep.forEach(e => byType[e.type] = (byType[e.type] || 0) + (e.end - e.start) / 3600000);
   const maxT = Math.max(...Object.values(byType), 1);
-  const typeCard = h(`<div class="card glass" style="display:flex;flex-direction:column;gap:10px"><div class="headline">时间去哪了</div></div>`);
+  const typeCard = h(`<div class="card glass" style="display:flex;flex-direction:column;gap:10px"><div class="headline">Where Time Went</div></div>`);
   Object.entries(byType).sort((a, b) => b[1] - a[1]).forEach(([t, v]) => {
     typeCard.appendChild(h(`<div class="bar-row"><span style="display:flex;align-items:center;gap:6px"><span class="dot" style="background:${TYPES[t]}"></span>${t}</span>
       <div class="bar-track"><div class="bar-fill" style="width:0;background:${TYPES[t]}" data-w="${v / maxT * 100}%"></div></div>
@@ -1791,15 +1850,15 @@ function renderReport() {
 
   const emo = {};
   logged.forEach(e => e.log.emotions.forEach(m => emo[m] = (emo[m] || 0) + 1));
-  const emoCard = h(`<div class="card glass" style="display:flex;flex-direction:column;gap:12px"><div><div class="headline">情绪</div><div class="caption" style="margin-top:4px">来自 ${logged.length} 条 log</div></div><div class="flow"></div></div>`);
+  const emoCard = h(`<div class="card glass" style="display:flex;flex-direction:column;gap:12px"><div><div class="headline">Emotions</div><div class="caption" style="margin-top:4px">From ${logged.length} logs</div></div><div class="flow"></div></div>`);
   Object.entries(emo).sort((a, b) => b[1] - a[1]).forEach(([m, c]) => emoCard.querySelector(".flow").appendChild(h(`<div class="chip tag">${m} <span class="caption mono">${c}</span></div>`)));
   body.appendChild(emoCard);
 
   const topType = Object.entries(byType).sort((a, b) => b[1] - a[1])[0];
   body.appendChild(h(`<div class="card glass" style="display:flex;flex-direction:column;gap:8px">
-    <div class="headline">✨ AI 洞察</div>
-    <div class="sub" style="line-height:1.5">这周「${topType?.[0] ?? "工作"}」占了 ${topType && hours ? Math.round(topType[1] / hours * 100) : 0}% 的时间。高投入的时段集中在上午 9–12 点，晚上的学习更容易走神，可以试试把阅读挪到早上。</div>
-    <div class="caption">Demo 里这段是模板文案；真实 app 里由 Agent 根据 log 生成</div>
+    <div class="headline">✨ AI Insight</div>
+    <div class="sub" style="line-height:1.5">${topType?.[0] ?? "Work"} took ${topType && hours ? Math.round(topType[1] / hours * 100) : 0}% of your time this week. Your high-effort blocks cluster between 9 and 12 in the morning, while evening study sessions drift more — try moving reading to the morning.</div>
+    <div class="caption">Template text in this demo; in the app, the Agent writes this from your logs</div>
   </div>`));
 
   requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -1813,29 +1872,29 @@ function renderReport() {
    ============================================================ */
 function renderMe() {
   const page = $("#me-page"); page.innerHTML = "";
-  page.appendChild(h(`<div class="page-title">我</div>`));
+  page.appendChild(h(`<div class="page-title">Me</div>`));
   page.appendChild(h(`<div class="card glass" style="display:flex;align-items:center;gap:14px">
     <div class="avatar">S</div>
-    <div><div class="headline">Stella</div><div class="caption" style="margin-top:2px">已记录 ${events.filter(e => e.log).length} 条 log · Demo 账号</div></div>
+    <div><div class="headline">Stella</div><div class="caption" style="margin-top:2px">${events.filter(e => e.log).length} logs · Demo account</div></div>
   </div>`));
   const t = h(`<div class="card glass" style="padding:4px 14px"></div>`);
-  [["AI Agent", true], ["每日回顾提醒", true], ["Focus 模式环境音", false]].forEach(([label, on]) => {
+  [["AI Agent", true], ["Daily Review Reminder", true], ["Focus Ambient Sound", false]].forEach(([label, on]) => {
     const r = h(`<div class="row"><span>${label}</span><div class="toggle ${on ? "on" : ""}"></div></div>`);
     r.querySelector(".toggle").onclick = e => { e.target.classList.toggle("on"); haptic("light"); };
     t.appendChild(r);
   });
   page.appendChild(t);
   const links = h(`<div class="card glass" style="padding:4px 14px"></div>`);
-  ["事件类型", "人物与群组", "节假日", "云同步", "语言 · 简体中文"].forEach(l => {
+  ["Event Types", "People & Groups", "Holidays", "Cloud Sync", "Language · English"].forEach(l => {
     const r = h(`<div class="row" style="cursor:pointer"><span>${l}</span><span class="chev">›</span></div>`);
-    r.onclick = () => toast("Demo 里没做这一页 🙂");
+    r.onclick = () => toast("Not built in this demo 🙂");
     links.appendChild(r);
   });
   page.appendChild(links);
-  const types = h(`<div class="card glass" style="display:flex;flex-direction:column;gap:12px"><div class="headline">我的事件类型</div><div class="flow"></div></div>`);
+  const types = h(`<div class="card glass" style="display:flex;flex-direction:column;gap:12px"><div class="headline">My Event Types</div><div class="flow"></div></div>`);
   Object.entries(TYPES).forEach(([n, c]) => types.querySelector(".flow").appendChild(h(`<div class="chip" style="color:var(--primary)"><span class="dot" style="background:${c}"></span>${n}</div>`)));
   page.appendChild(types);
-  page.appendChild(h(`<div class="caption" style="text-align:center;padding:8px">Done Web Demo · 所有数据只存在内存里</div>`));
+  page.appendChild(h(`<div class="caption" style="text-align:center;padding:8px">Done Web Demo · all data lives in memory only</div>`));
 }
 
 /* ============================================================
